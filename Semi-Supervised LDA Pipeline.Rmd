@@ -1,0 +1,80 @@
+# Semi-Supervised LDA Pipeline with Exploratory Visualization and LDAvis Output
+
+# Load libraries
+library(quanteda)
+library(topicmodels)
+library(textmineR)     # for coherence score evaluation
+library(LDAvis)        # for interactive visualization
+library(tidyverse)
+library(Rtsne)         # for t-SNE
+
+# 1. DATA CLEANING --------------------------------------------------------------
+
+# Load and preprocess corpus
+corpus_raw <- read_csv("reviews.csv")
+corpus_text <- corpus_raw$content
+
+corpus_tokens <- tokens(corpus_text, remove_punct = TRUE, remove_numbers = TRUE)
+corpus_tokens <- tokens_remove(corpus_tokens, pattern = stopwords("zh", source = "marimo"))
+
+# Customize your own stopwords
+custom_stopwords <- c("风筝", "电影", "一个", "铁头", "没有", "自己", "影片", "就是", "他们", 
+                      "时候", "都是", "最后", "片子", "的是", "可以", "一种", "觉得", "也是", 
+                      "看到", "一部", "中的", "还有", "感觉", "已经", "这种", "出来", "一直", "怎么", 
+                      "可是", "东西", "一次", "一段", "一点", "事情", "就像", "总是", "起来", "有些", 
+                      "整个", "我想", "片中", "来说", "本片", "的话", "看了", "一句", "到了")
+
+corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
+
+# Create Document-Feature Matrix (DFM)
+dfm <- dfm(corpus_tokens)
+dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
+
+# 2. EXPLORATORY VISUALIZATION (Optional) ---------------------------------------
+
+dfm_matrix <- convert(dfm, to = "matrix")
+dfm_tsne <- Rtsne(as.matrix(dist(dfm_matrix)), dims = 2, perplexity = 30)
+
+plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similarity")
+
+# 3. MANUAL SEED DEVELOPMENT ---------------------------------------------------
+
+# (Manual step, human-in-the-loop):
+# Review t-SNE clusters + high frequency words to develop seed word lists for each topic
+# Example:
+seed_topics <- list(
+  topic1 = c("政治", "体制", "黑暗", "压迫"),
+  topic2 = c("家庭", "母亲", "孩子", "成长"),
+  topic3 = c("历史", "社会", "文化", "记忆")
+)
+
+# 4. SEMI-SUPERVISED LDA (via textmineR) ----------------------------------------
+
+# Create TCM
+dtm <- CreateDtm(doc_vec = corpus_text, 
+                 doc_names = paste0("doc", 1:length(corpus_text)), 
+                 ngram_window = c(1, 1), 
+                 stopword_vec = c(stopwords("zh", source = "marimo"), custom_stopwords),
+                 lower = TRUE, remove_punctuation = TRUE, remove_numbers = TRUE)
+
+# Initialize LDA with seeds (pseudo-implementation — integrate guided LDA if needed)
+K <- 5
+model <- FitLdaModel(dtm = dtm, k = K, iterations = 1000, burnin = 200, alpha = 0.1, beta = 0.05,
+                     seed = 1234)
+
+# 5. TUNING AND EVALUATION -----------------------------------------------------
+
+# Coherence
+coherence <- CalcProbCoherence(phi = model$phi, dtm = dtm, M = 10)
+mean(coherence)
+
+# 6. LDAvis PREP AND VISUALIZATION ---------------------------------------------
+
+theta <- model$theta
+phi <- model$phi
+
+json_lda <- CreateJSON(phi = phi, theta = theta, doc.length = rowSums(dtm), 
+                       vocab = colnames(dtm), term.frequency = colSums(dtm))
+serVis(json_lda)
+
+# End of Pipeline
