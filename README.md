@@ -76,5 +76,9 @@ If you publish with it, please consider citing:
 Developed by Jiayi Zhang, a researcher interested in computational humanities, cultural memory, and audience cognition.  
 
 --- 
-> **In fragments we chatter, in patterns we conspire.**  
+> > **「形而上者谓之道，形而下者谓之器。」**  
+> ——《易经·系辞上传》
+> *What is above form is called Dao; what is beneath form is called instrument.*
 
+CulturaCognize listens for the Dao in patterns —  the meanings that drift above form yet emerge through form.  
+This is a pipeline for reading collective memory through the fragments we leave behind.
