@@ -18,6 +18,7 @@ This vignette walks through a semi-supervised topic modeling workflow for Chines
 ## Load Required Libraries
 ```r
 library(quanteda)
+library(quanteda.textmodels)
 library(topicmodels)
 library(textmineR)
 library(LDAvis)
@@ -25,6 +26,27 @@ library(tidyverse)
 library(Rtsne)
 library(rsconnect)
 library(shiny)
+```
+
+## File Structure
+```
+CulturaCognize/
+├── data/                    # Raw and preprocessed input data (e.g., reviews.csv)
+│   └── reviews.csv
+├── output/                  # Output files (e.g., LDA topics, t-SNE plots, LDAvis JSON)
+│   ├── lda_model.RDS
+│   ├── tsne_coordinates.csv
+│   └── ldavis.json
+├── dictionaries/           # Seed words or topic dictionaries for semi-supervised LDA
+│   └── seed_topics.csv
+├── scripts/                # Main pipeline and helpers
+│   ├── cultura_cognize_pipeline.R
+│   └── utils.R
+├── figures/                # Optional: visual outputs (e.g., topic diagrams)
+│   └── topics_overview.png
+├── LICENSE                 # MIT License
+├── README.md               # Project overview and usage
+└── CulturaCognize.Rproj    # Optional RStudio project file
 ```
 
 ## Data Cleaning and Tokenization
