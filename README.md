@@ -1,5 +1,6 @@
 # CulturaCognize
-*CulturaCognize* is a semi-supervised NLP pipeline designed to explore the intersection of **cognition** and **culture** through **film review analysis**. By combining topic modeling (LDA), dimensionality reduction (t-SNE), and interactive visualizations (LDAvis), this tool empowers researchers to uncover emergent interpretive frames in audience discourse—especially in contexts shaped by political memory and collective emotion.
+*CulturaCognize* is a semi-supervised NLP pipeline designed to explore the intersection of **cognition** and **culture** through **film review analysis** in Chinese. By combining topic modeling (LDA), dimensionality reduction (t-SNE), and interactive visualizations (LDAvis), this tool empowers researchers to uncover emergent interpretive frames in audience discourse—especially in contexts shaped by political memory and collective emotion.
+> **Note**: The customized stopwords and dictionary design showcased in this pipeline are based on our research using Douban reviews of *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger). While the repository serves as a general-purpose tutorial for semi-supervised topic modeling and visualization, it also reflects the methodological foundation of our applied work. The examples are intended as illustrative guides for broader use and adaptation.
 
 ## Features
 - **Semi-supervised LDA** using seeded topic dictionaries
