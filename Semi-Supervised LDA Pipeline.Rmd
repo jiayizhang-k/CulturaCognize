@@ -1,80 +1,96 @@
 # Semi-Supervised LDA Pipeline with Exploratory Visualization and LDAvis Output
 
-# Load libraries
+## Overview
+This pipeline supports semi-supervised topic modeling using Chinese-language film reviews. It includes steps for cleaning data, generating custom stopwords, exploring document similarity via t-SNE, building a seeded LDA model, evaluating coherence, and visualizing results interactively with LDAvis or via Shiny app.
+
+## 1. Load Required Libraries
+```r
 library(quanteda)
 library(topicmodels)
-library(textmineR)     # for coherence score evaluation
-library(LDAvis)        # for interactive visualization
+library(textmineR)
+library(LDAvis)
 library(tidyverse)
-library(Rtsne)         # for t-SNE
+library(Rtsne)
+library(rsconnect)
+library(shiny)
+```
 
-# 1. DATA CLEANING --------------------------------------------------------------
-
-# Load and preprocess corpus
+## 2. Data Cleaning
+```r
 corpus_raw <- read_csv("reviews.csv")
 corpus_text <- corpus_raw$content
 
 corpus_tokens <- tokens(corpus_text, remove_punct = TRUE, remove_numbers = TRUE)
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = stopwords("zh", source = "marimo"))
 
-# Customize your own stopwords
-custom_stopwords <- c("风筝", "电影", "一个", "铁头", "没有", "自己", "影片", "就是", "他们", 
-                      "时候", "都是", "最后", "片子", "的是", "可以", "一种", "觉得", "也是", 
-                      "看到", "一部", "中的", "还有", "感觉", "已经", "这种", "出来", "一直", "怎么", 
-                      "可是", "东西", "一次", "一段", "一点", "事情", "就像", "总是", "起来", "有些", 
-                      "整个", "我想", "片中", "来说", "本片", "的话", "看了", "一句", "到了")
+# Custom Farewell Stopwords
+custom_stopwords <- c("蝶衣","霸王", "一个", "自己", "虞姬", "电影", "小豆", "没有", "时候", "就是", "最后", "有用", "他们", "四爷", "也是", "可以", "都是", "的是", "开始", "师哥", "来自", "觉得", "石头", "看到", "他是", "一种", "已经", "真的", "一次", "只有", "不成", "可是", "成了", "知道", "其实", "后来", "一句", "哥哥", "中的", "本文", "转载", "凯歌", "这种", "出来", "无法", "很多", "怎么", "还有", "不能", "一部", "甚至", "终于", "也许", "出现", "公公", "东西", "一点", "楚霸王", "看完", "之能", "虽然", "于是", "并不", "或许", "多少", "看了", "一段", "来说", "就像", "无论", "身上", "我想", "不会", "一刻", "师父", "他在", "面前", "认为", "我是", "的活", "那种", "说的", "这里", "才是", "太多", "片子", "个儿", "那是", "想要", "那句", "真是", "是在", "便是", "有些", "更是", "随着", "整个", "青木", "说出", "有着", "事情", "令人", "下来", "你是", "出了", "仿佛", "她是", "当然", "都不", "项羽", "早已", "都有", "不再", "也有", "看来", "都在", "一遍", "有了", "不算", "身边", "再次", "一幕", "又是", "除了", "也就", "去了", "更加", "我也", "好像", "几个", "一下", "上了", "多么", "只要", "片中", "有点", "十分", "想到", "做到", "都会", "又有", "而已", "来看", "要是", "一片", "而言", "种种", "一把", "过了", "过的", "无可", "做的", "也要", "尽管", "了一", "再到", "也在", "跟着", "豆子", "他要", "一份", "被人", "放在", "就算", "我在", "就在", "他有", "那份", "不出", "而后", "他所", "是不",  "是有", "但在", "某种", "就有", "加上", "另一", "起了", "一条",  "看得", "给人", "留在", "当中", "不住", "一颗", "一根", "就要", "影片", "豆瓣", "师傅", "一辈子",  "一直", "作者", "版权", "形式",  "联系", "这篇", "影片", "可能", "剧透", "一天", "一年", "时辰", "尼姑", "二八", "青春", "削去", "头发", "一笑", "万古", "力拔山兮", "盖世", "演员", "癞子", "凤仙")
 
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
-
-# Create Document-Feature Matrix (DFM)
 dfm <- dfm(corpus_tokens)
 dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
+```
 
-# 2. EXPLORATORY VISUALIZATION (Optional) ---------------------------------------
-
+## 3. Exploratory Visualization (Optional)
+```r
 dfm_matrix <- convert(dfm, to = "matrix")
 dfm_tsne <- Rtsne(as.matrix(dist(dfm_matrix)), dims = 2, perplexity = 30)
-
 plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similarity")
+```
 
-# 3. MANUAL SEED DEVELOPMENT ---------------------------------------------------
-
-# (Manual step, human-in-the-loop):
-# Review t-SNE clusters + high frequency words to develop seed word lists for each topic
-# Example:
+## 4. Human-Guided Seed Design
+Use t-SNE and top word frequencies to guide seed creation.
+```r
 seed_topics <- list(
   topic1 = c("政治", "体制", "黑暗", "压迫"),
   topic2 = c("家庭", "母亲", "孩子", "成长"),
   topic3 = c("历史", "社会", "文化", "记忆")
 )
+```
 
-# 4. SEMI-SUPERVISED LDA (via textmineR) ----------------------------------------
-
-# Create TCM
-dtm <- CreateDtm(doc_vec = corpus_text, 
-                 doc_names = paste0("doc", 1:length(corpus_text)), 
+## 5. Semi-Supervised LDA
+```r
+dtm <- CreateDtm(doc_vec = corpus_text, doc_names = paste0("doc", 1:length(corpus_text)), 
                  ngram_window = c(1, 1), 
                  stopword_vec = c(stopwords("zh", source = "marimo"), custom_stopwords),
                  lower = TRUE, remove_punctuation = TRUE, remove_numbers = TRUE)
 
-# Initialize LDA with seeds (pseudo-implementation — integrate guided LDA if needed)
-K <- 5
-model <- FitLdaModel(dtm = dtm, k = K, iterations = 1000, burnin = 200, alpha = 0.1, beta = 0.05,
+model <- FitLdaModel(dtm = dtm, k = 5, iterations = 1000, burnin = 200, alpha = 0.1, beta = 0.05,
                      seed = 1234)
+```
 
-# 5. TUNING AND EVALUATION -----------------------------------------------------
-
-# Coherence
+## 6. Evaluation
+```r
 coherence <- CalcProbCoherence(phi = model$phi, dtm = dtm, M = 10)
 mean(coherence)
+```
 
-# 6. LDAvis PREP AND VISUALIZATION ---------------------------------------------
-
-theta <- model$theta
-phi <- model$phi
-
-json_lda <- CreateJSON(phi = phi, theta = theta, doc.length = rowSums(dtm), 
+## 7. LDAvis Output
+```r
+json_lda <- CreateJSON(phi = model$phi, theta = model$theta, doc.length = rowSums(dtm), 
                        vocab = colnames(dtm), term.frequency = colSums(dtm))
 serVis(json_lda)
+write(json_lda, file = "lda.json")
+serVis(json_lda, out.dir = "LDAvis_output", open.browser = FALSE)
+```
 
-# End of Pipeline
+## 8. Shiny App Deployment
+```r
+ui <- shinyUI(
+  fluidPage(
+    h1('How we make sense of the past?'),
+    p('An RShiny page for LDAvis, by Jiayi Zhang'),
+    visOutput('myChart')
+  )
+)
+
+server <- shinyServer(function(input, output, session){
+  output$myChart <- renderVis({
+     readChar("lda.json", file.info("lda.json")$size)
+  })
+})
+
+shinyApp(ui = ui, server = server)
+```
+
+---
