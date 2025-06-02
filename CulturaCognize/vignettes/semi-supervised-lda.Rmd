@@ -13,7 +13,7 @@ vignette: >
 
 This vignette walks through a semi-supervised topic modeling workflow for Chinese-language film reviews. It uses LDA with human-coded seed words, offers document similarity visualization via t-SNE, and presents interactive topic exploration through LDAvis.
 
-*Note: Customized stopwords and dictionary design are examples from our work on *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger), who use this pipeline for their work on film reviews using Douban comments.*
+**Note**: Customized stopwords and dictionary design are examples from our work on *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger), who use this pipeline for their work on film reviews using Douban comments. The examples here are intended as illustrative guides for general use.
 
 ## Load Required Libraries
 ```r
@@ -35,7 +35,7 @@ corpus_text <- corpus_raw$content
 corpus_tokens <- tokens(corpus_text, remove_punct = TRUE, remove_numbers = TRUE)
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = stopwords("zh", source = "marimo"))
 
-custom_stopwords <- c("蝶衣","霸王", "一个", "自己", "虞姬", "电影", "小豆", "没有", "时候", "就是", "最后", "有用", "他们", ...)
+custom_stopwords <- c("蝶衣","霸王", "一个", "自己", "虞姬", "电影", "小豆", "没有", "时候", "就是", "最后", "有用", "他们")
 
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
 dfm <- dfm(corpus_tokens)
@@ -51,42 +51,46 @@ plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similari
 
 ## Seed Design with Human Input
 ```r
-seed_topics <- list(
+seed_topics <- dictionary(list(
   Anomie = c('悲剧','绝望','动荡','无情','失去','痛苦','悲哀','疯狂','黑暗','挣扎','害怕','混乱','折磨','暴力','悲惨','可悲','沉重','残忍','悲伤','苦难','崩溃','残酷','艰苦','辛苦'),
   Fatalism = c('命运','注定','死了','突然','成就','死亡','死去','凡人','乱世','毁灭','宿命','天命', '无力','命苦','认命'),
   Powerlessness= c('可惜','不愿','难以','普通','妥协','平凡','承受','屈服','隐忍','牺牲','可怜','压抑', '孤独','无奈','放弃'),
   Integrity = c('人性','人心','人格','抛弃','扭曲','出卖','转变','背叛','揭发','批斗','自保','六亲', '不认'),
-  ...
-)
+...
+))
 ```
 
-## Semi-Supervised LDA
+## Semi-Supervised LDA using `textmodel_seededlda`
 ```r
-dtm <- CreateDtm(doc_vec = corpus_text, doc_names = paste0("doc", 1:length(corpus_text)), 
-                 ngram_window = c(1, 1), 
-                 stopword_vec = c(stopwords("zh", source = "marimo"), custom_stopwords),
-                 lower = TRUE, remove_punctuation = TRUE, remove_numbers = TRUE)
-
-model <- FitLdaModel(dtm = dtm, k = 5, iterations = 1000, burnin = 200, alpha = 0.1, beta = 0.05,
-                     seed = 1234)
+set.seed(2025)
+dfm_sslda <- dfm_weight(dfm, scheme = "count")
+model <- textmodel_seededlda(dfm_sslda, seed_topics, residual = 3, 
+                                auto_iter = FALSE,
+                                max_iter = 2000,
+                                verbose = TRUE )
 ```
+
 
 ## Coherence Evaluation
 ```r
-coherence <- CalcProbCoherence(phi = model$phi, dtm = dtm, M = 10)
-mean(coherence)
+# Optional: Use other metrics or visualization packages here if desired
 ```
 
 ## LDAvis Output
 ```r
-json_lda <- CreateJSON(phi = model$phi, theta = model$theta, doc.length = rowSums(dtm), 
-                       vocab = colnames(dtm), term.frequency = colSums(dtm))
+json_lda <- createJSON(
+  phi = model$phi, 
+  theta = model$theta, 
+  doc.length = rowSums(dfm_sslda), 
+  vocab = colnames(dfm_sslda), 
+  term.frequency = colSums(dfm_sslda)
+)
 serVis(json_lda)
 write(json_lda, file = "lda.json")
 serVis(json_lda, out.dir = "LDAvis_output", open.browser = FALSE)
 ```
 
-## Deploying to Shiny
+## ☁Deploying to Shiny
 ```r
 ui <- shinyUI(
   fluidPage(
@@ -104,6 +108,14 @@ server <- shinyServer(function(input, output, session){
 
 shinyApp(ui = ui, server = server)
 ```
+
+## 🔗 Live Demo
+
+You can explore the interactive topic model results for *Farewell My Concubine* directly here:
+
+👉 **[LDAvis Shiny App – Farewell My Concubine](https://jiayizhangg.shinyapps.io/farewell/#topic=2&lambda=1&term=)**
+
+This visualization presents the output from our semi-supervised LDA model using human-coded seed words and is powered by LDAvis on RShiny.
 
 ---
 
