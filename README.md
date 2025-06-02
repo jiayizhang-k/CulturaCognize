@@ -76,7 +76,7 @@ If you publish with it, please consider citing:
 Developed by Jiayi Zhang, a researcher interested in computational humanities, cultural memory, and audience cognition.  
 
 --- 
-> > **「形而上者谓之道，形而下者谓之器。」**  
+> **「形而上者谓之道，形而下者谓之器。」**  
 > ——《易经·系辞上传》
 > *What is above form is called Dao; what is beneath form is called instrument.*
 
