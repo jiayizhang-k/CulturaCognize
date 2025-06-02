@@ -74,6 +74,6 @@ If you publish with it, please consider citing:
 ## About the Author
 Developed by Jiayi Zhang, a researcher interested in computational humanities, cultural memory, and audience cognition.  
 
----
-“Culture is the residue of cognition made collective. Let's analyze it—beautifully.”
+--- 
+> **“In fragments we chatter, in patterns we conspire — this is our poetry, murmured by the crowd.”**  
 
