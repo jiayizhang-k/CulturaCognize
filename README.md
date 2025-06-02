@@ -37,27 +37,21 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
 
 ## File Structure
 CulturaCognize/
-├── data/                    # Raw and preprocessed input data (e.g., reviews.csv)
-│
-├── output/                  # Output files (e.g., LDA topics, t-SNE plots, LDAvis JSON)
-│   ├── lda_model.RDS
-│   ├── tsne_coordinates.csv
-│   └── ldavis.json
-│
-├── dictionaries/            # Seed words or topic dictionaries for semi-supervised LDA
-│   └── seed_topics.csv
-│
-├── scripts/                 # Main pipeline and helpers
-│   ├── cultura_cognize_pipeline.R
-│   └── utils.R
-│
-├── figures/                 # Optional: visual outputs (e.g., topic diagrams)
-│   └── topics_overview.png
-│
-├── LICENSE                  # MIT License
-├── README.md                # Project overview and usage
-└── .Rproj                   # Optional RStudio project file
-
+- data/                       # Raw and preprocessed input data (e.g., reviews.csv)
+- output/                     # Output files (e.g., LDA topics, t-SNE plots, LDAvis JSON)
+  - lda_model.RDS
+  - tsne_coordinates.csv
+  - ldavis.json
+- dictionaries/              # Seed words or topic dictionaries for semi-supervised LDA
+    - seed_topics.csv
+- scripts/                   # Main pipeline and helpers
+    - cultura_cognize_pipeline.R
+    - utils.R
+- figures/                   # Optional: visual outputs (e.g., topic diagrams)
+    - topics_overview.png
+- LICENSE                    # MIT License
+    - README.md                  # Project overview and usage
+    - .Rproj                     # Optional RStudio project file
 
 
 ## License
