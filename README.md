@@ -35,28 +35,29 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
     - `t-SNE`: for clusterable patterns
     - `LDAvis`: for inter-topic distance and prevalence
 
-## 📂 File Structure
+## File Structure
 CulturaCognize/
-├── data/ # Raw and preprocessed input data (e.g., reviews.csv)
+├── data/                    # Raw and preprocessed input data (e.g., reviews.csv)
 │
-├── output/ # Output files (e.g., LDA topics, t-SNE plots, JSON for LDAvis)
-│ ├── lda_model.RDS # Saved LDA model object
-│ ├── tsne_coordinates.csv # t-SNE 2D projection of document clusters
-│ └── ldavis.json # JSON file for LDAvis visualization
+├── output/                  # Output files (e.g., LDA topics, t-SNE plots, LDAvis JSON)
+│   ├── lda_model.RDS
+│   ├── tsne_coordinates.csv
+│   └── ldavis.json
 │
-├── dictionaries/ # Seed words or custom topic dictionaries for semi-supervised LDA
-│ └── seed_topics.csv
+├── dictionaries/            # Seed words or topic dictionaries for semi-supervised LDA
+│   └── seed_topics.csv
 │
-├── scripts/ # Main pipeline and helper functions
-│ ├── cultura_cognize_pipeline.R
-│ └── utils.R
+├── scripts/                 # Main pipeline and helpers
+│   ├── cultura_cognize_pipeline.R
+│   └── utils.R
 │
-├── figures/ # Optional folder for exported plots or diagrams
-│ └── topics_overview.png
+├── figures/                 # Optional: visual outputs (e.g., topic diagrams)
+│   └── topics_overview.png
 │
-├── README.md # Project overview and usage guide
-├── LICENSE # MIT License
-└── .Rproj # R project file (optional but recommended for IDE support)
+├── LICENSE                  # MIT License
+├── README.md                # Project overview and usage
+└── .Rproj                   # Optional RStudio project file
+
 
 
 ## License
