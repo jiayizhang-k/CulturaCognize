@@ -90,7 +90,7 @@ write(json_lda, file = "lda.json")
 serVis(json_lda, out.dir = "LDAvis_output", open.browser = FALSE)
 ```
 
-## ☁Deploying to Shiny
+## Deploying to Shiny
 ```r
 ui <- shinyUI(
   fluidPage(
@@ -109,7 +109,7 @@ server <- shinyServer(function(input, output, session){
 shinyApp(ui = ui, server = server)
 ```
 
-## 🔗 Live Demo
+## Live Demo
 
 You can explore the interactive topic model results for *Farewell My Concubine* directly here:
 
