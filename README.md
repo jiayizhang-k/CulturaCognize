@@ -36,22 +36,29 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
     - `LDAvis`: for inter-topic distance and prevalence
 
 ## File Structure
-CulturaCognize/
-- data/                       # Raw and preprocessed input data (e.g., reviews.csv)
-- output/                     # Output files (e.g., LDA topics, t-SNE plots, LDAvis JSON)
-  - lda_model.RDS
-  - tsne_coordinates.csv
-  - ldavis.json
-- dictionaries/              # Seed words or topic dictionaries for semi-supervised LDA
-    - seed_topics.csv
-- scripts/                   # Main pipeline and helpers
-    - cultura_cognize_pipeline.R
-    - utils.R
-- figures/                   # Optional: visual outputs (e.g., topic diagrams)
-    - topics_overview.png
-- LICENSE                    # MIT License
-    - README.md                  # Project overview and usage
-    - .Rproj                     # Optional RStudio project file
+- `data/` — Raw and preprocessed input data  
+  - `reviews.csv`
+
+- `output/` — Output files from modeling and visualization  
+  - `lda_model.RDS` — Fitted LDA model  
+  - `tsne_coordinates.csv` — t-SNE 2D coordinates  
+  - `ldavis.json` — JSON input for LDAvis app  
+
+- `dictionaries/` — Custom seed dictionaries for semi-supervised LDA  
+  - `seed_topics.csv`
+
+- `scripts/` — Main pipeline and helper functions  
+  - `cultura_cognize_pipeline.R`  
+  - `utils.R`
+
+- `figures/` — Visual outputs (optional)  
+  - `topics_overview.png`
+
+- `LICENSE` — MIT License
+
+- `README.md` — Project overview and usage instructions
+
+- `CulturaCognize.Rproj` — RStudio project file
 
 
 ## License
