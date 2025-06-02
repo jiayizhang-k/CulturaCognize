@@ -1,0 +1,110 @@
+---
+title: "CulturaCognize Vignette: Semi-Supervised LDA on Film Reviews"
+author: "Jiayi Zhang"
+date: "2025-06-01"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CulturaCognize: Semi-Supervised LDA on Film Reviews}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# CulturaCognize: Semi-Supervised LDA with Visualization
+
+This vignette walks through a semi-supervised topic modeling workflow for Chinese-language film reviews. It uses LDA with human-coded seed words, offers document similarity visualization via t-SNE, and presents interactive topic exploration through LDAvis.
+
+*Note: Customized stopwords and dictionary design are examples from our work on *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger), who use this pipeline for their work on film reviews using Douban comments.*
+
+## Load Required Libraries
+```r
+library(quanteda)
+library(topicmodels)
+library(textmineR)
+library(LDAvis)
+library(tidyverse)
+library(Rtsne)
+library(rsconnect)
+library(shiny)
+```
+
+## Data Cleaning and Tokenization
+```r
+corpus_raw <- read_csv("reviews.csv")
+corpus_text <- corpus_raw$content
+
+corpus_tokens <- tokens(corpus_text, remove_punct = TRUE, remove_numbers = TRUE)
+corpus_tokens <- tokens_remove(corpus_tokens, pattern = stopwords("zh", source = "marimo"))
+
+custom_stopwords <- c("蝶衣","霸王", "一个", "自己", "虞姬", "电影", "小豆", "没有", "时候", "就是", "最后", "有用", "他们", ...)
+
+corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
+dfm <- dfm(corpus_tokens)
+dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
+```
+
+## Exploratory Visualization via t-SNE
+```r
+dfm_matrix <- convert(dfm, to = "matrix")
+dfm_tsne <- Rtsne(as.matrix(dist(dfm_matrix)), dims = 2, perplexity = 30)
+plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similarity")
+```
+
+## Seed Design with Human Input
+```r
+seed_topics <- list(
+  Anomie = c('悲剧','绝望','动荡','无情','失去','痛苦','悲哀','疯狂','黑暗','挣扎','害怕','混乱','折磨','暴力','悲惨','可悲','沉重','残忍','悲伤','苦难','崩溃','残酷','艰苦','辛苦'),
+  Fatalism = c('命运','注定','死了','突然','成就','死亡','死去','凡人','乱世','毁灭','宿命','天命', '无力','命苦','认命'),
+  Powerlessness= c('可惜','不愿','难以','普通','妥协','平凡','承受','屈服','隐忍','牺牲','可怜','压抑', '孤独','无奈','放弃'),
+  Integrity = c('人性','人心','人格','抛弃','扭曲','出卖','转变','背叛','揭发','批斗','自保','六亲', '不认'),
+  ...
+)
+```
+
+## Semi-Supervised LDA
+```r
+dtm <- CreateDtm(doc_vec = corpus_text, doc_names = paste0("doc", 1:length(corpus_text)), 
+                 ngram_window = c(1, 1), 
+                 stopword_vec = c(stopwords("zh", source = "marimo"), custom_stopwords),
+                 lower = TRUE, remove_punctuation = TRUE, remove_numbers = TRUE)
+
+model <- FitLdaModel(dtm = dtm, k = 5, iterations = 1000, burnin = 200, alpha = 0.1, beta = 0.05,
+                     seed = 1234)
+```
+
+## Coherence Evaluation
+```r
+coherence <- CalcProbCoherence(phi = model$phi, dtm = dtm, M = 10)
+mean(coherence)
+```
+
+## LDAvis Output
+```r
+json_lda <- CreateJSON(phi = model$phi, theta = model$theta, doc.length = rowSums(dtm), 
+                       vocab = colnames(dtm), term.frequency = colSums(dtm))
+serVis(json_lda)
+write(json_lda, file = "lda.json")
+serVis(json_lda, out.dir = "LDAvis_output", open.browser = FALSE)
+```
+
+## Deploying to Shiny
+```r
+ui <- shinyUI(
+  fluidPage(
+    h1('How we make sense of the past?'),
+    p('An RShiny page for LDAvis, by Jiayi Zhang'),
+    visOutput('myChart')
+  )
+)
+
+server <- shinyServer(function(input, output, session){
+  output$myChart <- renderVis({
+     readChar("lda.json", file.info("lda.json")$size)
+  })
+})
+
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+This pipeline illustrates how interpretive human coding can complement statistical modeling for richer insights into cultural reception and memory through film discourse.
