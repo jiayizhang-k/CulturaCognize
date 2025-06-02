@@ -1,7 +1,9 @@
 # Semi-Supervised LDA Pipeline with Exploratory Visualization and LDAvis Output
 
 ## Overview
-This pipeline supports semi-supervised topic modeling using Chinese-language film reviews. It includes steps for cleaning data, generating custom stopwords, exploring document similarity via t-SNE, building a seeded LDA model, evaluating coherence, and visualizing results interactively with LDAvis or via Shiny app.
+This pipeline supports semi-supervised topic modeling using Chinese-language film reviews. It includes steps for cleaning data, generating custom stopwords, exploring document similarity via t-SNE, building a seeded LDA model, evaluating coherence, and visualizing results interactively with LDAvis or via Shiny app. 
+
+*Note: Customized stopwords and dictionary design are examples from our work on *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger), who use this pipeline for their work on film reviews using Douban comments.*
 
 ## 1. Load Required Libraries
 ```r
@@ -23,7 +25,7 @@ corpus_text <- corpus_raw$content
 corpus_tokens <- tokens(corpus_text, remove_punct = TRUE, remove_numbers = TRUE)
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = stopwords("zh", source = "marimo"))
 
-# Custom Farewell Stopwords
+# Custom Stopwords
 custom_stopwords <- c("蝶衣","霸王", "一个", "自己", "虞姬", "电影", "小豆", "没有", "时候", "就是", "最后", "有用", "他们", "四爷", "也是", "可以", "都是", "的是", "开始", "师哥", "来自", "觉得", "石头", "看到", "他是", "一种", "已经", "真的", "一次", "只有", "不成", "可是", "成了", "知道", "其实", "后来", "一句", "哥哥", "中的", "本文", "转载", "凯歌", "这种", "出来", "无法", "很多", "怎么", "还有", "不能", "一部", "甚至", "终于", "也许", "出现", "公公", "东西", "一点", "楚霸王", "看完", "之能", "虽然", "于是", "并不", "或许", "多少", "看了", "一段", "来说", "就像", "无论", "身上", "我想", "不会", "一刻", "师父", "他在", "面前", "认为", "我是", "的活", "那种", "说的", "这里", "才是", "太多", "片子", "个儿", "那是", "想要", "那句", "真是", "是在", "便是", "有些", "更是", "随着", "整个", "青木", "说出", "有着", "事情", "令人", "下来", "你是", "出了", "仿佛", "她是", "当然", "都不", "项羽", "早已", "都有", "不再", "也有", "看来", "都在", "一遍", "有了", "不算", "身边", "再次", "一幕", "又是", "除了", "也就", "去了", "更加", "我也", "好像", "几个", "一下", "上了", "多么", "只要", "片中", "有点", "十分", "想到", "做到", "都会", "又有", "而已", "来看", "要是", "一片", "而言", "种种", "一把", "过了", "过的", "无可", "做的", "也要", "尽管", "了一", "再到", "也在", "跟着", "豆子", "他要", "一份", "被人", "放在", "就算", "我在", "就在", "他有", "那份", "不出", "而后", "他所", "是不",  "是有", "但在", "某种", "就有", "加上", "另一", "起了", "一条",  "看得", "给人", "留在", "当中", "不住", "一颗", "一根", "就要", "影片", "豆瓣", "师傅", "一辈子",  "一直", "作者", "版权", "形式",  "联系", "这篇", "影片", "可能", "剧透", "一天", "一年", "时辰", "尼姑", "二八", "青春", "削去", "头发", "一笑", "万古", "力拔山兮", "盖世", "演员", "癞子", "凤仙")
 
 corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
@@ -39,12 +41,17 @@ plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similari
 ```
 
 ## 4. Human-Guided Seed Design
-Use t-SNE and top word frequencies to guide seed creation.
+Use t-SNE and top word frequencies to guide seed creation in form of a dictionary.
 ```r
 seed_topics <- list(
-  topic1 = c("政治", "体制", "黑暗", "压迫"),
-  topic2 = c("家庭", "母亲", "孩子", "成长"),
-  topic3 = c("历史", "社会", "文化", "记忆")
+ (Anomie = c('悲剧','绝望','动荡','无情','失去','痛苦','悲哀','疯狂','黑暗','挣扎','害怕','混乱','折磨','暴力','悲惨','可悲','沉重','残忍','悲伤','苦难','崩溃','残酷','艰苦','辛苦'),
+  Fatalism = c('命运','注定','死了','突然','成就','死亡','死去','凡人','乱世','毁灭','宿命','天命', '无力','命苦','认命'),
+  Powerlessness= c('可惜','不愿','难以','普通','妥协','平凡','承受','屈服','隐忍','牺牲','可怜','压抑', '孤独','无奈','放弃'),
+  Integrity =c('人性','人心','人格','抛弃','扭曲','出卖','转变','背叛','揭发','批斗','自保','六亲', '不认'), 
+  Optimism= c('活着','希望','精神','坚持','活在','追求','执着','英雄','理想','纯粹','存在','日子','生存','幸福','倔强','美好','岁月','尊严','努力','梦想','温暖','信仰','热爱','坚守','善良','信念','活下去','坚定','未来'), 
+  Progression =c('文革','解放','思想','发展','文化大革命','成功','今天','现代', '革命','文革时期','民族','抗日','共产', '反抗','封建', '批判', '意识'),
+  Ideological = c('第五', '五代', '大奖', '棕榈', '获奖','外国','西方', '国际', '资本', '伤痕'),
+  Folk = c('洪流', '浪潮', '风云', '潮流', '车轮', '落尘'))
 )
 ```
 
