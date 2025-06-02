@@ -76,5 +76,5 @@ If you publish with it, please consider citing:
 Developed by Jiayi Zhang, a researcher interested in computational humanities, cultural memory, and audience cognition.  
 
 --- 
-> **“In fragments we chatter, in patterns we conspire — this is our poetry, murmured by the crowd.”**  
+> **In fragments we chatter, in patterns we conspire.**  
 
