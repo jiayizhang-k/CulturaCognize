@@ -35,24 +35,28 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
     - `t-SNE`: for clusterable patterns
     - `LDAvis`: for inter-topic distance and prevalence
 
-## File Structure
-- `data/` — Raw and preprocessed input data  
-  - `reviews.csv`
+## File Structure (after running the full pipeline)
+- `data/` — Input
+  - `reviews.csv`: Raw and preprocessed film review data 
 
 - `output/` — Output files from modeling and visualization  
-  - `lda_model.RDS` — Fitted LDA model  
-  - `tsne_coordinates.csv` — t-SNE 2D coordinates  
-  - `ldavis.json` — JSON input for LDAvis app  
+  - `lda_model.RDS`: Fitted LDA model  
+  - `tsne_coordinates.csv`: t-SNE 2D coordinates  
+  - `ldavis.json`: JSON input for LDAvis app
+  - `LDAvis_output`/: Folder containing LDAvis HTML files 
 
-- `dictionaries/` — Custom seed dictionaries for semi-supervised LDA  
-  - `seed_topics.csv`
+- `dictionaries/` —  Input (custom seed words) 
+  - `seed_topics.csv`: Custom seed dictionaries for semi-supervised LDA  
 
-- `scripts/` — Main pipeline and helper functions  
-  - `cultura_cognize_pipeline.R`  
-  - `utils.R`
+- `scripts/` — Source 
+  - `cultura_cognize_pipeline.R`: Main R pipeline script
+  - `utils.R`: Optional helper functions (to be filled)
 
-- `figures/` — Visual outputs (optional)  
-  - `topics_overview.png`
+- `figures/` — Output (optional)
+  - `topics_overview.png`: Saved plot(s) from t-SNE or LDA diagnostics
+ 
+- `vignettes/` —  Documentation
+  - `semi-supervised-lda.Rmd`: Tutorial-style walk-through of pipeline
 
 - `LICENSE` — MIT License
 
