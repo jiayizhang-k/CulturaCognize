@@ -47,6 +47,8 @@ dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
 ## Exploratory Visualization via t-SNE (Term-Level)
 
 To assist the seed design process, we first visualize the top 80 terms by **frequency** and **TF-IDF** using 2D t-SNE and cluster them into five groups each. The plot shows term positions and cluster colors interactively.
+Showing both frequency and TF-IDF helps reveal both the core vocabulary and the context-specific language, crucial for nuanced cultural interpretation.
+Using plotly means users can explore, hover, zoom — critical for presentations, papers, and teaching.
 
 ```r
 # Frequency-based term t-SNE
