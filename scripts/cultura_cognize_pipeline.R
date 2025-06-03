@@ -26,10 +26,49 @@ corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
 dfm <- dfm(corpus_tokens)
 dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
 
-# Exploratory t-SNE Visualization
-dfm_matrix <- convert(dfm, to = "matrix")
-dfm_tsne <- Rtsne(as.matrix(dist(dfm_matrix)), dims = 2, perplexity = 30)
-plot(dfm_tsne$Y, col = "blue", pch = 19, main = "t-SNE Plot of Document Similarity")
+
+# ---  Exploratory t-SNE Visualization for Term Similarity ---
+# (use voyant if you like)
+
+# Frequency-based t-SNE
+term_matrix_freq <- t(as.matrix(dfm))
+top_terms_freq <- names(sort(rowSums(term_matrix_freq), decreasing = TRUE))[1:80]
+term_matrix_top_freq <- term_matrix_freq[top_terms_freq, ]
+term_matrix_top_freq <- term_matrix_top_freq[!duplicated(term_matrix_top_freq), ]
+tsne_freq <- Rtsne(term_matrix_top_freq, dims = 2, perplexity = 20)
+term_df_freq <- as.data.frame(tsne_freq$Y)
+colnames(term_df_freq) <- c("Dim1", "Dim2")
+term_df_freq$Term <- rownames(term_matrix_top_freq)
+set.seed(1)
+term_df_freq$Cluster <- as.factor(kmeans(term_df_freq[,1:2], centers = 5)$cluster)
+plot_freq <- plot_ly(term_df_freq, x = ~Dim1, y = ~Dim2, type = 'scatter', mode = 'markers+text',
+                     color = ~Cluster, colors = "Set1", text = ~Term, textposition = "top center",
+                     marker = list(size = 8)) %>%
+  layout(title = "t-SNE (Top 80 Terms by Frequency)",
+         xaxis = list(title = "t-SNE 1"), yaxis = list(title = "t-SNE 2"))
+
+# TF-IDF-based t-SNE
+tfidf_matrix <- as.matrix(t(dfm_tfidf(dfm)))
+top_terms_tfidf <- names(sort(rowMeans(tfidf_matrix), decreasing = TRUE))[1:80]
+term_matrix_top_tfidf <- tfidf_matrix[top_terms_tfidf, ]
+term_matrix_top_tfidf <- term_matrix_top_tfidf[!duplicated(term_matrix_top_tfidf), ]
+tsne_tfidf <- Rtsne(term_matrix_top_tfidf, dims = 2, perplexity = 20)
+term_df_tfidf <- as.data.frame(tsne_tfidf$Y)
+colnames(term_df_tfidf) <- c("Dim1", "Dim2")
+term_df_tfidf$Term <- rownames(term_matrix_top_tfidf)
+set.seed(2)
+term_df_tfidf$Cluster <- as.factor(kmeans(term_df_tfidf[,1:2], centers = 5)$cluster)
+plot_tfidf <- plot_ly(term_df_tfidf, x = ~Dim1, y = ~Dim2, type = 'scatter', mode = 'markers+text',
+                      color = ~Cluster, colors = "Set2", text = ~Term, textposition = "top center",
+                      marker = list(size = 8)) %>%
+  layout(title = "t-SNE (Top 80 Terms by TF-IDF)",
+         xaxis = list(title = "t-SNE 1"), yaxis = list(title = "t-SNE 2"))
+
+# Show both side by side
+subplot(plot_freq, plot_tfidf, nrows = 1, margin = 0.05) %>%
+  layout(title = "Term-Level t-SNE: Frequency vs. TF-IDF (w/ Labels & Clusters)")
+
+# ------------------------------------------------------------------------
 
 # Define Seed Topics
 dict_seeds <- dictionary(list(
