@@ -87,7 +87,7 @@ subplot(plot_freq, plot_tfidf, nrows = 1, margin = 0.05) %>%
   layout(title = "Term-Level t-SNE: Frequency vs. TF-IDF (w/ Labels & Clusters)")
 ```
 ## Seed Design Preparation 2
-##Unsupervised LDA using `textmodel_seededlda`
+## Unsupervised LDA using `textmodel_seededlda`
 
 To further assist the seed design process, we apply unsupervised LDA to the full document-feature matrix to uncover latent topics based on term co-occurrence patterns. These topic-term groupings serve as a statistical counterpoint to the visually derived clusters from t-SNE.
 
