@@ -1,11 +1,13 @@
 # CulturaCognize
+*A hybrid visual + statistical NLP tool for interpretive cultural analysis in R*
+
 *CulturaCognize* is a semi-supervised NLP pipeline designed to explore the intersection of **cognition** and **culture** through **film review analysis** in Chinese. By combining topic modeling (LDA), dimensionality reduction (t-SNE), and interactive visualizations (LDAvis), this tool empowers researchers to uncover emergent interpretive frames in audience discourse—especially in contexts shaped by political memory and collective emotion.
 > **Note**: The customized stopwords and dictionary design showcased in this pipeline are based on our research using Douban reviews of *Farewell My Concubine* (Jiayi Zhang and Chandler Rosenberger). While the repository serves as a general-purpose tutorial for semi-supervised topic modeling and visualization, it also reflects the methodological foundation of our applied work. The examples are intended as illustrative guides for broader use and adaptation.
 
 ## Features
-- **Semi-supervised LDA** using seeded topic dictionaries
 - **Custom stopword handling** for domain-specific corpora (e.g., Chinese film reviews)
-- **t-SNE visualization** for pre-labeling clusters to aid human coding
+- **Dual t-SNE visualizations (Frequency & TF-IDF)** for intuitive cluster comparison and semantic exploration to aid seed design
+- **Semi-supervised LDA** using seeded topic dictionaries
 - **LDAvis integration** for interactive topic distance maps
 - Tunable parameters like seed strength, topic number, and iterations
 - Built for **R** using `quanteda`, `textmineR`, `LDAvis`, and `Rtsne`
@@ -33,7 +35,7 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
     - Seed your dictionary for semi-supervised LDA
 
 4. Visualize results in:
-    - `t-SNE`: for clusterable patterns
+    - `t-SNE`: for visual term-level clustering using both frequency and TF-IDF
     - `LDAvis`: for inter-topic distance and prevalence
 
 ## File Structure (after running the full pipeline)
@@ -57,7 +59,8 @@ This pipeline is especially useful for digital humanists, cognitive sociologists
   - `topics_overview.png`: Saved plot(s) from t-SNE or LDA diagnostics
  
 - `vignettes/` —  Documentation
-  - `semi-supervised-lda.Rmd`: Tutorial-style walk-through of pipeline
+  - `semi-supervised-lda.Rmd`: Walk-through of pipeline including dual t-SNE visualizations, unsupervised LDA, and seed design strategy
+
 
 - `LICENSE` — MIT License
 
