@@ -68,6 +68,13 @@ plot_tfidf <- plot_ly(term_df_tfidf, x = ~Dim1, y = ~Dim2, type = 'scatter', mod
 subplot(plot_freq, plot_tfidf, nrows = 1, margin = 0.05) %>%
   layout(title = "Term-Level t-SNE: Frequency vs. TF-IDF (w/ Labels & Clusters)")
 
+# ---  Exploratory Unsupervised LDA  ---
+```r
+set.seed(2024)
+lda_model <- textmodel_lda(dfm, k = 8)
+terms(lda_model, 10)  # Top 10 terms per topic
+```
+
 # ------------------------------------------------------------------------
 
 # Define Seed Topics
