@@ -43,7 +43,7 @@ corpus_tokens <- tokens_remove(corpus_tokens, pattern = custom_stopwords)
 dfm <- dfm(corpus_tokens)
 dfm <- dfm_trim(dfm, min_termfreq = 5, min_docfreq = 3)
 ```
-
+## Seed Design Preparation 1
 ## Exploratory Visualization via t-SNE (Term-Level)
 
 To assist the seed design process, we first visualize the top 80 terms by **frequency** and **TF-IDF** using 2D t-SNE and cluster them into five groups each. The plot shows term positions and cluster colors interactively.
@@ -86,6 +86,24 @@ plot_tfidf <- plot_ly(term_df_tfidf, x = ~Dim1, y = ~Dim2, type = 'scatter', mod
 subplot(plot_freq, plot_tfidf, nrows = 1, margin = 0.05) %>%
   layout(title = "Term-Level t-SNE: Frequency vs. TF-IDF (w/ Labels & Clusters)")
 ```
+## Seed Design Preparation 2
+##Unsupervised LDA using `textmodel_seededlda`
+
+To further assist the seed design process, we apply unsupervised LDA to the full document-feature matrix to uncover latent topics based on term co-occurrence patterns. These topic-term groupings serve as a statistical counterpoint to the visually derived clusters from t-SNE.
+
+This dual strategy strengthens our confidence in initial seed selections by triangulating across:
+1. Semantic proximity from t-SNE (frequency & tf-idf views)
+2. Co-occurrence logic from unsupervised LDA
+3. Human interpretation of meaningful term groupings
+
+This workflow ensures interpretability, consistency, and thematic richness for downstream semi-supervised modeling.
+
+```r
+set.seed(2024)
+lda_model <- textmodel_lda(dfm, k = 8)
+terms(lda_model, 10)  # Top 10 terms per topic
+```
+-------------------------
 
 ## Seed Design with Human Input
 ```r
