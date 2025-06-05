@@ -103,7 +103,7 @@ set.seed(2024)
 lda_model <- textmodel_lda(dfm, k = 8)
 terms(lda_model, 10)  # Top 10 terms per topic
 ```
--------------------------
+# ------------------------------------------------------------------------
 
 ## Seed Design with Human Input
 ```r
